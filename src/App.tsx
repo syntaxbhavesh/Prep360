@@ -101,7 +101,7 @@ export default function App() {
     setScheduleNotice(result.unscheduledCount ? `Could not schedule ${result.unscheduledCount} tasks. Set study days and daily hours above zero.` : `Scheduled ${result.scheduledCount} unfinished tasks${overdue ? `, including ${overdue} overdue items recovered` : ''}.${result.overloadedCount ? ` ${result.overloadedCount} task(s) exceed your daily capacity and need to be split manually.` : ''}`)
   }
   function saveProfile() {
-    const stream = profileClass === '11' ? profileStream : 'Science'
+    const stream = profileClass === '11' && profileExam !== 'IIT-JEE' && profileExam !== 'NEET' ? profileStream : 'Science'
     const profile: StudentProfile = { examTrack: profileExam, classLevel: profileClass, stream }
     const generated = buildCurriculum(profile)
     setWorkspace(w => ({ ...w, exam: profileExam + ' · Class ' + profileClass, profile, profileConfigured: true, subjects: mergeCurriculum(w.subjects, generated) }))
