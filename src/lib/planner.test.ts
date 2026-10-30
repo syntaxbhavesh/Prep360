@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { PracticeRecord, StudyTask, Subject } from '../types'
-import { estimateBacklog, estimateDays, generateStudySchedule, getCompletion, getRemainingMinutes, getStudyMinutes, getPracticeTotals, minutesToLabel } from './planner'
+import { estimateBacklog, estimateDays, generateStudySchedule, getCompletion, getRemainingMinutes, getStudyMinutes, getPracticeTotals, getChapterPerformance, minutesToLabel } from './planner'
 
 const tasks: StudyTask[] = [
   { id: 'a', title: 'Lecture', subject: 'Physics', kind: 'Lecture', minutes: 75, date: '2026-10-30', done: true },
@@ -61,5 +61,21 @@ describe('Prep360 planning utilities', () => {
     ]
     expect(getPracticeTotals(logs)).toEqual({ totalQuestions: 40, attempted: 30, correct: 23, mistakes: 7, accuracy: 77, completion: 75 })
     expect(getPracticeTotals([]).accuracy).toBe(0)
+  })
+
+  it('ranks chapters using matching subject and chapter practice data', () => {
+    const curriculum: Subject[] = [{
+      id: 'physics', name: 'Physics', color: '#7867f7', total: 2, completed: 1,
+      chapters: [{ id: 'kinematics', name: 'Kinematics', topics: [
+        { id: 't1', name: 'Motion', lectureStatus: 'Completed', dppStatus: 'Completed', moduleStatus: 'Not started', revisionStatus: 'In progress' },
+        { id: 't2', name: 'Graphs', lectureStatus: 'Not started', dppStatus: 'Not started', moduleStatus: 'Not started', revisionStatus: 'Not started' },
+      ] }]
+    }]
+    const logs: PracticeRecord[] = [
+      { id: 'p1', title: 'DPP', subject: ' physics ', chapter: 'kinematics', source: 'DPP', totalQuestions: 20, attempted: 10, correct: 5, mistakes: 5, date: '2026-10-30', notes: '' },
+    ]
+    const result = getChapterPerformance(curriculum, logs)
+    expect(result[0]).toMatchObject({ topicCount: 2, lecturesDone: 1, dppDone: 1, modulesDone: 0, revisionDone: 0, attempted: 10, correct: 5, mistakes: 5, accuracy: 50, practiceSets: 1, priority: 'High' })
+    expect(getChapterPerformance(curriculum, [])[0].priority).toBe('No data')
   })
 })
