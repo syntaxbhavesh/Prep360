@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { Activity, ArrowRight, BarChart3, BookOpen, CalendarDays, Check, ChevronDown, CircleHelp, Clock3, GraduationCap, LayoutDashboard, ListChecks, Menu, Plus, Search, Settings2, Sparkles, Target, Timer, TrendingUp, X, Zap } from 'lucide-react'
-import type { Chapter, PracticeRecord, StudyTask, Topic, Workspace } from './types'
+import type { Chapter, PracticeRecord, StudentProfile, StudyTask, Topic, Workspace } from './types'
 import { loadWorkspace, saveWorkspace } from './lib/storage'
+import { buildCurriculum, mergeCurriculum } from './lib/curriculum'
 import { estimateBacklog, generateStudySchedule, getOverdueTasks, getCompletion, getRemainingMinutes, getStudyMinutes, getChapterPerformance, getPracticeTotals, getRevisionQueue, getNextRevisionDate, minutesToLabel } from './lib/planner'
 
 type Page = 'Overview' | 'Study planner' | 'Syllabus' | 'Backlog' | 'Practice & tests' | 'Analytics' | 'Backlog planner' | 'Revision planner'
@@ -22,7 +23,7 @@ const uid = () => Math.random().toString(36).slice(2, 10)
 export default function App() {
   const [workspace, setWorkspace] = useState<Workspace>(loadWorkspace)
   const [page, setPage] = useState<Page>('Overview')
-  const [modal, setModal] = useState<'setup' | 'task' | null>(null)
+  const [modal, setModal] = useState<'setup' | 'task' | 'onboarding' | null>(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [taskTitle, setTaskTitle] = useState('')
@@ -30,6 +31,9 @@ export default function App() {
   const [taskKind, setTaskKind] = useState<StudyTask['kind']>('Practice')
   const [taskMinutes, setTaskMinutes] = useState('45')
   const [examName, setExamName] = useState(workspace.exam)
+  const [profileExam, setProfileExam] = useState<StudentProfile['examTrack']>(workspace.profile?.examTrack ?? 'IIT-JEE')
+  const [profileClass, setProfileClass] = useState<StudentProfile['classLevel']>(workspace.profile?.classLevel ?? '11')
+  const [profileStream, setProfileStream] = useState<StudentProfile['stream']>(workspace.profile?.stream ?? 'Science')
   const [targetDate, setTargetDate] = useState(workspace.targetDate)
   const [subjectName, setSubjectName] = useState('')
   const [lectureTotal, setLectureTotal] = useState('')
@@ -55,7 +59,7 @@ export default function App() {
   const [practiceNotes, setPracticeNotes] = useState('')
   const [practiceError, setPracticeError] = useState('')
 
-  useEffect(() => saveWorkspace(workspace), [workspace])
+  useEffect(() => { saveWorkspace(workspace); if (!workspace.profileConfigured) setModal(current => current ?? 'onboarding') }, [workspace])
   const completed = workspace.tasks.filter(t => t.done).length
   const todayTasks = workspace.tasks.filter(t => t.date === today)
   const totalMinutes = getStudyMinutes(workspace.tasks)
@@ -95,6 +99,13 @@ export default function App() {
     setWorkspace(w => ({ ...w, tasks: result.tasks }))
     const overdue = getOverdueTasks(workspace.tasks).length
     setScheduleNotice(result.unscheduledCount ? `Could not schedule ${result.unscheduledCount} tasks. Set study days and daily hours above zero.` : `Scheduled ${result.scheduledCount} unfinished tasks${overdue ? `, including ${overdue} overdue items recovered` : ''}.${result.overloadedCount ? ` ${result.overloadedCount} task(s) exceed your daily capacity and need to be split manually.` : ''}`)
+  }
+  function saveProfile() {
+    const stream = profileClass === '11' ? profileStream : 'Science'
+    const profile: StudentProfile = { examTrack: profileExam, classLevel: profileClass, stream }
+    const generated = buildCurriculum(profile)
+    setWorkspace(w => ({ ...w, exam: profileExam + ' · Class ' + profileClass, profile, profileConfigured: true, subjects: mergeCurriculum(w.subjects, generated) }))
+    setModal(null)
   }
   function saveSetup() {
     if (!examName.trim()) return
@@ -164,7 +175,7 @@ export default function App() {
         <footer className="footer-note"><span>PREP360</span><span>Plan with clarity. Prepare with confidence.</span><span>Progress is stored locally on this device.</span></footer>
       </div>
     </main>
-    {modal && <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setModal(null)}}><div className="modal"><div className="modal-heading"><div><span className="section-kicker">{modal==='setup'?'PERSONALISE YOUR SPACE':'ADD TO YOUR PLAN'}</span><h2>{modal==='setup'?'Workspace settings':'New study task'}</h2></div><button className="icon-button" onClick={()=>setModal(null)} aria-label="Close"><X size={18}/></button></div>{modal==='setup'?<div className="form-stack"><label>Exam or goal name<input value={examName} onChange={e=>setExamName(e.target.value)} placeholder="e.g. JEE Main, NEET, UPSC, Class 12"/></label><label>Target date <input type="date" value={targetDate} onChange={e=>setTargetDate(e.target.value)}/></label><div className="form-divider"/><p className="form-hint">Optionally add your first subject.</p><label>Subject name<input value={subjectName} onChange={e=>setSubjectName(e.target.value)} placeholder="e.g. Physics"/></label><label>Total lectures <input type="number" min="0" value={lectureTotal} onChange={e=>setLectureTotal(e.target.value)} placeholder="e.g. 40"/></label><button className="primary-button full-button" onClick={saveSetup} disabled={!examName.trim()}>Save workspace <ArrowRight size={16}/></button></div>:<div className="form-stack"><label>What do you need to do?<input autoFocus value={taskTitle} onChange={e=>setTaskTitle(e.target.value)} placeholder="e.g. Complete quadratic equations lecture" onKeyDown={e=>{if(e.key==='Enter')addTask()}}/></label><div className="form-two"><label>Subject<input value={taskSubject} onChange={e=>setTaskSubject(e.target.value)} placeholder="e.g. Mathematics"/></label><label>Task type<select value={taskKind} onChange={e=>setTaskKind(e.target.value as StudyTask['kind'])}><option>Practice</option><option>Lecture</option><option>Revision</option><option>Test</option></select></label></div><label>Estimated duration (minutes)<input type="number" min="5" step="5" value={taskMinutes} onChange={e=>setTaskMinutes(e.target.value)}/></label><div className="modal-note"><Timer size={16}/> Your task will be added to today's plan. You can mark it complete when you're done.</div><button className="primary-button full-button" onClick={addTask} disabled={!taskTitle.trim()}>Add to today's plan <Plus size={16}/></button></div>}</div></div>}
+    {modal && <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&modal!=='onboarding')setModal(null)}}><div className={'modal '+(modal==='onboarding'?'onboarding-modal':'')}><div className="modal-heading"><div><span className="section-kicker">{modal==='setup'?'PERSONALISE YOUR SPACE':modal==='onboarding'?'WELCOME TO PREP360':'ADD TO YOUR PLAN'}</span><h2>{modal==='setup'?'Workspace settings':modal==='onboarding'?'Build your study workspace':'New study task'}</h2></div>{modal!=='onboarding'&&<button className="icon-button" onClick={()=>setModal(null)} aria-label="Close"><X size={18}/></button>}</div>{modal==='onboarding'?<div className="form-stack"><p className="onboarding-intro">Choose your preparation track and current class. We'll load a ready-made subject and chapter checklist for you.</p><div className="onboarding-label">1. SELECT YOUR EXAM</div><div className="choice-grid">{([{value:'IIT-JEE',desc:'Engineering entrance',mark:'J'} ,{value:'NEET',desc:'Medical entrance',mark:'N'},{value:'Defence',desc:'Defence entrance prep',mark:'D'},{value:'Foundation',desc:'School + foundation',mark:'F'}] as const).map(option=><button key={option.value} type="button" className={'choice-card '+(profileExam===option.value?'selected':'')} onClick={()=>setProfileExam(option.value)}><span className="choice-mark">{option.mark}</span><strong>{option.value}</strong><small>{option.desc}</small></button>)}</div><div className="onboarding-label">2. SELECT YOUR CLASS</div><div className="class-choice-row">{(['9','10','11'] as const).map(level=><button type="button" key={level} className={'class-choice '+(profileClass===level?'selected':'')} onClick={()=>setProfileClass(level)}>Class {level}</button>)}</div>{profileClass==='11'&&<><div className="onboarding-label">3. SELECT YOUR STREAM</div><div className="class-choice-row stream-choice">{(['Science','Commerce','Humanities'] as const).map(stream=><button type="button" key={stream} disabled={(profileExam==='IIT-JEE'||profileExam==='NEET')&&stream!=='Science'} className={'class-choice '+(profileStream===stream?'selected':'')} onClick={()=>setProfileStream(stream)}>{stream}</button>)}</div>{(profileExam==='IIT-JEE'||profileExam==='NEET')&&<p className="form-hint">IIT-JEE and NEET preparation uses the Science stream. Choose Foundation or Defence if you need a different Class 11 stream.</p>}</>}<div className="curriculum-preview"><BookOpen size={17}/><div><strong>Ready-made syllabus will be added</strong><span>{profileClass==='11'?(profileExam==='NEET'?'Physics, Chemistry, Biology and support subjects':profileExam==='Defence'?'Your stream subjects plus Reasoning and General Awareness':'Your selected stream subjects'):'Mathematics, Science, Social Science and English'} · You can edit chapters later.</span></div></div><p className="curriculum-source-note">Chapter names are a starter curriculum mapped to NCERT-style subjects and entrance-exam areas. Exact exam scope can change; use the official current syllabus for final verification.</p><button className="primary-button full-button" onClick={saveProfile}>Create my workspace <ArrowRight size={16}/></button></div>:modal==='setup'?<div className="form-stack"><label>Exam or goal name<input value={examName} onChange={e=>setExamName(e.target.value)} placeholder="e.g. JEE Main, NEET, UPSC, Class 12"/></label><label>Target date <input type="date" value={targetDate} onChange={e=>setTargetDate(e.target.value)}/></label><div className="form-divider"/><p className="form-hint">Optionally add your first subject.</p><label>Subject name<input value={subjectName} onChange={e=>setSubjectName(e.target.value)} placeholder="e.g. Physics"/></label><label>Total lectures <input type="number" min="0" value={lectureTotal} onChange={e=>setLectureTotal(e.target.value)} placeholder="e.g. 40"/></label><button className="primary-button full-button" onClick={saveSetup} disabled={!examName.trim()}>Save workspace <ArrowRight size={16}/></button><button className="secondary-button full-button" onClick={()=>{setProfileExam(workspace.profile?.examTrack??'IIT-JEE');setProfileClass(workspace.profile?.classLevel??'11');setProfileStream(workspace.profile?.stream??'Science');setModal('onboarding')}}>Change exam and curriculum</button></div>:<div className="form-stack"><label>What do you need to do?<input autoFocus value={taskTitle} onChange={e=>setTaskTitle(e.target.value)} placeholder="e.g. Complete quadratic equations lecture" onKeyDown={e=>{if(e.key==='Enter')addTask()}}/></label><div className="form-two"><label>Subject<input value={taskSubject} onChange={e=>setTaskSubject(e.target.value)} placeholder="e.g. Mathematics"/></label><label>Task type<select value={taskKind} onChange={e=>setTaskKind(e.target.value as StudyTask['kind'])}><option>Practice</option><option>Lecture</option><option>Revision</option><option>Test</option></select></label></div><label>Estimated duration (minutes)<input type="number" min="5" step="5" value={taskMinutes} onChange={e=>setTaskMinutes(e.target.value)}/></label><div className="modal-note"><Timer size={16}/> Your task will be added to today's plan. You can mark it complete when you're done.</div><button className="primary-button full-button" onClick={addTask} disabled={!taskTitle.trim()}>Add to today's plan <Plus size={16}/></button></div>}</div></div>}
   </div>
 }
 
