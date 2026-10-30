@@ -78,4 +78,13 @@ describe('Prep360 planning utilities', () => {
     expect(result[0]).toMatchObject({ topicCount: 2, lecturesDone: 1, dppDone: 1, modulesDone: 0, revisionDone: 0, attempted: 10, correct: 5, mistakes: 5, accuracy: 50, practiceSets: 1, priority: 'High' })
     expect(getChapterPerformance(curriculum, [])[0].priority).toBe('No data')
   })
+  it('builds a spaced revision queue and advances the interval after each revision', () => {
+    const curriculum: Subject[] = [{ id: 's', name: 'Physics', color: '#7867f7', total: 1, completed: 1, chapters: [{ id: 'c', name: 'Motion', topics: [{ id: 't', name: 'Velocity', lectureStatus: 'Completed', dppStatus: 'Not started', moduleStatus: 'Not started', revisionStatus: 'Not started', nextRevisionDate: '2026-10-30' }] }] }]
+    expect(getRevisionQueue(curriculum, '2026-10-30')[0].status).toBe('Due today')
+    expect(getRevisionQueue(curriculum, '2026-10-31')[0].status).toBe('Overdue')
+    expect(getNextRevisionDate(0, '2026-10-30')).toBe('2026-10-31')
+    expect(getNextRevisionDate(1, '2026-10-30')).toBe('2026-11-02')
+    expect(getNextRevisionDate(5, '2026-10-30')).toBe('2026-11-29')
+  })
+
 })
