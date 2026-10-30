@@ -54,4 +54,4 @@ describe('Prep360 planning utilities', () => {
     const paused = generateStudySchedule(source, 0, 6, new Date(2026, 9, 30))
     expect(paused.unscheduledCount).toBe(1)
   })
-}
+})
