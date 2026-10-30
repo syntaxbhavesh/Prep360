@@ -4,7 +4,7 @@ export const emptyWorkspace: Workspace = { exam: '', targetDate: '', tasks: [], 
 const validStatus = (value: unknown): Topic['lectureStatus'] => value === 'Completed' || value === 'In progress' ? value : 'Not started'
 function normalizeTopic(value: unknown, index: number): Topic {
   const item = (value && typeof value === 'object' ? value : {}) as Partial<Topic>
-  return { id: typeof item.id === 'string' ? item.id : `topic-${index}`, name: typeof item.name === 'string' ? item.name : 'Untitled topic', lectureStatus: validStatus(item.lectureStatus), dppStatus: validStatus(item.dppStatus), moduleStatus: validStatus(item.moduleStatus), revisionStatus: validStatus(item.revisionStatus) }
+  return { id: typeof item.id === 'string' ? item.id : `topic-${index}`, name: typeof item.name === 'string' ? item.name : 'Untitled topic', lectureStatus: validStatus(item.lectureStatus), dppStatus: validStatus(item.dppStatus), moduleStatus: validStatus(item.moduleStatus), revisionStatus: validStatus(item.revisionStatus), revisionCount: Math.max(0, Math.floor(Number(item.revisionCount) || 0)), lastRevisedAt: typeof item.lastRevisedAt === 'string' ? item.lastRevisedAt : undefined, nextRevisionDate: typeof item.nextRevisionDate === 'string' ? item.nextRevisionDate : undefined }
 }
 function normalizeChapter(value: unknown, index: number): Chapter {
   const item = (value && typeof value === 'object' ? value : {}) as Partial<Chapter>
