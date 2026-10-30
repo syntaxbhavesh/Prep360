@@ -9,6 +9,14 @@ const sets: Record<string,string[]> = {
   'Social Science':['History','Geography','Political Science','Economics'],
   Science:['Matter in Our Surroundings','Is Matter Around Us Pure','Atoms and Molecules','Structure of the Atom','The Fundamental Unit of Life','Tissues','Motion','Force and Laws of Motion','Gravitation','Work and Energy','Sound','Why Do We Fall Ill','Natural Resources','Improvement in Food Resources'],
   Science10:['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment'],
+  'History 9':['The French Revolution','Socialism in Europe and the Russian Revolution','Nazism and the Rise of Hitler','Forest Society and Colonialism','Pastoralists in the Modern World'],
+  'Geography 9':['India – Size and Location','Physical Features of India','Drainage','Climate','Natural Vegetation and Wildlife','Population'],
+  'Civics 9':['What is Democracy? Why Democracy?','Constitutional Design','Electoral Politics','Working of Institutions','Democratic Rights'],
+  'Economics 9':['The Story of Village Palampur','People as Resource','Poverty as a Challenge','Food Security in India'],
+  'History 10':['The Rise of Nationalism in Europe','Nationalism in India','The Making of a Global World','The Age of Industrialisation','Print Culture and the Modern World'],
+  'Geography 10':['Resources and Development','Forest and Wildlife Resources','Water Resources','Agriculture','Minerals and Energy Resources','Manufacturing Industries','Lifelines of National Economy'],
+  'Civics 10':['Power Sharing','Federalism','Gender, Religion and Caste','Political Parties','Outcomes of Democracy'],
+  'Economics 10':['Development','Sectors of the Indian Economy','Money and Credit','Globalisation and the Indian Economy','Consumer Rights'],
   'Math 9':['Number Systems','Polynomials','Coordinate Geometry','Linear Equations in Two Variables','Euclid’s Geometry','Lines and Angles','Triangles','Quadrilaterals','Circles','Heron’s Formula','Surface Areas and Volumes','Statistics','Probability'],
   'Math 10':['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
   Accountancy:['Introduction to Accounting','Theory Base of Accounting','Recording of Transactions','Bank Reconciliation Statement','Trial Balance and Rectification of Errors','Depreciation, Provisions and Reserves','Bills of Exchange','Financial Statements'],
@@ -28,8 +36,8 @@ function makeSubject(name:string,index:number,key:string):Subject {
 }
 export function buildCurriculum(p:ProfileInput):Subject[] {
  let result:Subject[]
- if(p.classLevel==='9') result=[makeSubject('Mathematics',0,'Math 9'),makeSubject('Science',1,'Science'),makeSubject('Social Science',2,'Social Science'),makeSubject('English',3,'English')]
- else if(p.classLevel==='10') result=[makeSubject('Mathematics',0,'Math 10'),makeSubject('Science',1,'Science10'),makeSubject('Social Science',2,'Social Science'),makeSubject('English',3,'English')]
+ if(p.classLevel==='9') result=[makeSubject('Mathematics',0,'Math 9'),makeSubject('Science',1,'Science'),makeSubject('History',2,'History 9'),makeSubject('Geography',3,'Geography 9'),makeSubject('Civics',4,'Civics 9'),makeSubject('Economics',5,'Economics 9'),makeSubject('English',0,'English')]
+ else if(p.classLevel==='10') result=[makeSubject('Mathematics',0,'Math 10'),makeSubject('Science',1,'Science10'),makeSubject('History',2,'History 10'),makeSubject('Geography',3,'Geography 10'),makeSubject('Civics',4,'Civics 10'),makeSubject('Economics',5,'Economics 10'),makeSubject('English',0,'English')]
  else if(p.stream==='Science') {
   result=[makeSubject('Physics',0,'Physics'),makeSubject('Chemistry',1,'Chemistry'),makeSubject('Mathematics',2,'Mathematics'),makeSubject('English',3,'English'),makeSubject('Computer Science',4,'Computer Science')]
   if(p.examTrack==='NEET') result=result.filter(s=>s.name!=='Mathematics').concat(makeSubject('Biology',5,'Biology'))
