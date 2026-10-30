@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { PracticeRecord, StudyTask, Subject } from '../types'
-import { estimateBacklog, estimateDays, generateStudySchedule, getCompletion, getRemainingMinutes, getStudyMinutes, getPracticeTotals, getChapterPerformance, minutesToLabel } from './planner'
+import { estimateBacklog, estimateDays, generateStudySchedule, getCompletion, getRemainingMinutes, getStudyMinutes, getPracticeTotals, getChapterPerformance, getRevisionQueue, getNextRevisionDate, minutesToLabel } from './planner'
 
 const tasks: StudyTask[] = [
   { id: 'a', title: 'Lecture', subject: 'Physics', kind: 'Lecture', minutes: 75, date: '2026-10-30', done: true },
