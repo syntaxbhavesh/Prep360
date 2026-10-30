@@ -8,6 +8,7 @@ const sets: Record<string,string[]> = {
   English:['Reading Comprehension','Writing Skills','Grammar and Usage','Literature'],
   'Social Science':['History','Geography','Political Science','Economics'],
   Science:['Matter in Our Surroundings','Is Matter Around Us Pure','Atoms and Molecules','Structure of the Atom','The Fundamental Unit of Life','Tissues','Motion','Force and Laws of Motion','Gravitation','Work and Energy','Sound','Why Do We Fall Ill','Natural Resources','Improvement in Food Resources'],
+  Science10:['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment'],
   'Math 9':['Number Systems','Polynomials','Coordinate Geometry','Linear Equations in Two Variables','Euclid’s Geometry','Lines and Angles','Triangles','Quadrilaterals','Circles','Heron’s Formula','Surface Areas and Volumes','Statistics','Probability'],
   'Math 10':['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
   Accountancy:['Introduction to Accounting','Theory Base of Accounting','Recording of Transactions','Bank Reconciliation Statement','Trial Balance and Rectification of Errors','Depreciation, Provisions and Reserves','Bills of Exchange','Financial Statements'],
@@ -26,14 +27,15 @@ function makeSubject(name:string,index:number,key:string):Subject {
  return {id:key+'-subject',name,color:colors[index%colors.length],total:chapters.length,completed:0,chapters}
 }
 export function buildCurriculum(p:ProfileInput):Subject[] {
- if(p.classLevel==='9') return [makeSubject('Mathematics',0,'Math 9'),makeSubject('Science',1,'Science'),makeSubject('Social Science',2,'Social Science'),makeSubject('English',3,'English')]
- if(p.classLevel==='10') return [makeSubject('Mathematics',0,'Math 10'),makeSubject('Science',1,'Science'),makeSubject('Social Science',2,'Social Science'),makeSubject('English',3,'English')]
  let result:Subject[]
- if(p.stream==='Science') result=[makeSubject('Physics',0,'Physics'),makeSubject('Chemistry',1,'Chemistry'),makeSubject('Mathematics',2,'Mathematics'),makeSubject('English',3,'English'),makeSubject('Computer Science',4,'Computer Science')]
- else if(p.stream==='Commerce') result=[makeSubject('Accountancy',0,'Accountancy'),makeSubject('Business Studies',1,'Business Studies'),makeSubject('Economics',2,'Economics'),makeSubject('Mathematics',3,'Mathematics'),makeSubject('English',4,'English'),makeSubject('Computer Science',5,'Computer Science')]
+ if(p.classLevel==='9') result=[makeSubject('Mathematics',0,'Math 9'),makeSubject('Science',1,'Science'),makeSubject('Social Science',2,'Social Science'),makeSubject('English',3,'English')]
+ else if(p.classLevel==='10') result=[makeSubject('Mathematics',0,'Math 10'),makeSubject('Science',1,'Science10'),makeSubject('Social Science',2,'Social Science'),makeSubject('English',3,'English')]
+ else if(p.stream==='Science') {
+  result=[makeSubject('Physics',0,'Physics'),makeSubject('Chemistry',1,'Chemistry'),makeSubject('Mathematics',2,'Mathematics'),makeSubject('English',3,'English'),makeSubject('Computer Science',4,'Computer Science')]
+  if(p.examTrack==='NEET') result=result.filter(s=>s.name!=='Mathematics').concat(makeSubject('Biology',5,'Biology'))
+ } else if(p.stream==='Commerce') result=[makeSubject('Accountancy',0,'Accountancy'),makeSubject('Business Studies',1,'Business Studies'),makeSubject('Economics',2,'Economics'),makeSubject('Mathematics',3,'Mathematics'),makeSubject('English',4,'English'),makeSubject('Computer Science',5,'Computer Science')]
  else result=[makeSubject('History',0,'History'),makeSubject('Political Science',1,'Political Science'),makeSubject('Geography',2,'Geography'),makeSubject('Economics',3,'Economics'),makeSubject('English',4,'English'),makeSubject('Computer Science',5,'Computer Science')]
- if(p.examTrack==='NEET'&&p.stream==='Science') result=result.filter(s=>s.name!=='Mathematics').concat(makeSubject('Biology',5,'Biology'))
- if(p.examTrack==='Defence'){result.push(makeSubject('Reasoning',result.length,'Reasoning'),makeSubject('General Awareness',result.length+1,'General Awareness'))}
+ if(p.examTrack==='Defence') result.push(makeSubject('Reasoning',result.length,'Reasoning'),makeSubject('General Awareness',result.length+1,'General Awareness'))
  return result
 }
 export function mergeCurriculum(existing:Subject[],fresh:Subject[]):Subject[]{
