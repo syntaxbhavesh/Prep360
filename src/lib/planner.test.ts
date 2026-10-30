@@ -54,4 +54,12 @@ describe('Prep360 planning utilities', () => {
     const paused = generateStudySchedule(source, 0, 6, new Date(2026, 9, 30))
     expect(paused.unscheduledCount).toBe(1)
   })
+  it('calculates practice totals and accuracy safely', () => {
+    const logs: PracticeRecord[] = [
+      { id: 'p1', title: 'DPP 1', subject: 'Physics', chapter: 'Kinematics', source: 'DPP', totalQuestions: 30, attempted: 20, correct: 15, mistakes: 5, date: '2026-10-30', notes: '' },
+      { id: 'p2', title: 'PYQ set', subject: 'Maths', chapter: 'Algebra', source: 'PYQ', totalQuestions: 10, attempted: 10, correct: 8, mistakes: 2, date: '2026-10-30', notes: '' },
+    ]
+    expect(getPracticeTotals(logs)).toEqual({ totalQuestions: 40, attempted: 30, correct: 23, mistakes: 7, accuracy: 77, completion: 75 })
+    expect(getPracticeTotals([]).accuracy).toBe(0)
+  })
 })
