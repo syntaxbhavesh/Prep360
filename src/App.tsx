@@ -210,7 +210,7 @@ export default function App() {
   }
   function saveSetup() {
     if (!examName.trim()) return
-    setWorkspace(w => ({ ...w, exam: examName.trim(), targetDate, subjects: subjectName.trim() ? [...w.subjects, { id: uid(), name: subjectName.trim(), color: '#7867f7', total: Math.max(0, Number(lectureTotal) || 0), completed: 0 }] : w.subjects }))
+    setWorkspace(w => ({ ...w, exam: examName.trim(), targetDate }))
     setSubjectName(''); setLectureTotal(''); setModal(null)
   }
   function addChapter(subjectId: string) {
