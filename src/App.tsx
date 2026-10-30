@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { Activity, ArrowRight, BarChart3, BookOpen, CalendarDays, Check, ChevronDown, CircleHelp, Clock3, Flame, GraduationCap, LayoutDashboard, ListChecks, Menu, Plus, Search, Settings2, Sparkles, Target, Timer, TrendingUp, X, Zap } from 'lucide-react'
+import { Activity, ArrowRight, BarChart3, BookOpen, CalendarDays, Check, ChevronDown, CircleHelp, Clock3, Flame, GraduationCap, LayoutDashboard, ListChecks, Menu, Plus, Search, Settings2, Sparkles, Target, Timer, TrendingUp, X } from 'lucide-react'
 import type { Chapter, PracticeRecord, StudentProfile, StudyTask, Topic, Workspace } from './types'
 import { loadWorkspace, saveWorkspace } from './lib/storage'
 import { buildCurriculum, mergeCurriculum } from './lib/curriculum'
