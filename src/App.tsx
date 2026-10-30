@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { Activity, ArrowDownRight, ArrowRight, BarChart3, BookOpen, CalendarDays, Check, ChevronDown, CircleHelp, Clock3, GraduationCap, LayoutDashboard, ListChecks, Menu, Plus, Search, Settings2, Sparkles, Target, Timer, TrendingUp, X, Zap } from 'lucide-react'
+import { Activity, ArrowRight, BarChart3, BookOpen, CalendarDays, Check, ChevronDown, CircleHelp, Clock3, GraduationCap, LayoutDashboard, ListChecks, Menu, Plus, Search, Settings2, Sparkles, Target, Timer, TrendingUp, X, Zap } from 'lucide-react'
 import type { Chapter, PracticeRecord, StudyTask, Topic, Workspace } from './types'
 import { loadWorkspace, saveWorkspace } from './lib/storage'
 import { estimateBacklog, generateStudySchedule, getOverdueTasks, getCompletion, getRemainingMinutes, getStudyMinutes, getChapterPerformance, getPracticeTotals, minutesToLabel } from './lib/planner'
