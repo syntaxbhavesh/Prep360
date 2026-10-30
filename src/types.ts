@@ -4,4 +4,5 @@ export type Chapter = { id: string; name: string; topics: Topic[] }
 export type StudyTask = { id: string; title: string; subject: string; kind: 'Lecture' | 'Practice' | 'Revision' | 'Test'; minutes: number; date: string; done: boolean }
 export type Subject = { id: string; name: string; color: string; total: number; completed: number; chapters?: Chapter[] }
 export type PracticeRecord = { id: string; title: string; subject: string; chapter: string; source: 'DPP' | 'Module' | 'PYQ' | 'Mock test' | 'Other'; totalQuestions: number; attempted: number; correct: number; mistakes: number; date: string; notes: string }
-export type StudentProfile = { examTrack: 'IIT-JEE' | 'NEET' | 'Defence' | 'Foundation'; classLevel: '9' | '10' | '11'; stream: 'Science' | 'Commerce' | 'Humanities' }\nexport type Workspace = { exam: string; targetDate: string; tasks: StudyTask[]; subjects: Subject[]; practiceLogs?: PracticeRecord[]; profileConfigured?: boolean; profile?: StudentProfile }
+export type StudentProfile = { examTrack: 'IIT-JEE' | 'NEET' | 'Defence' | 'Foundation'; classLevel: '9' | '10' | '11'; stream: 'Science' | 'Commerce' | 'Humanities' }
+export type Workspace = { exam: string; targetDate: string; tasks: StudyTask[]; subjects: Subject[]; practiceLogs?: PracticeRecord[]; profileConfigured?: boolean; profile?: StudentProfile }
