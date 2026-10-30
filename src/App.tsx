@@ -8,7 +8,7 @@ import { generateStudySchedule, getOverdueTasks, getCompletion, getRemainingMinu
 
 type Page = 'Overview' | 'Study planner' | 'Syllabus' | 'Backlog' | 'Done Tasks' | 'Practice & tests' | 'Analytics' | 'Revision planner'
 const pagePaths: Record<Page, string> = { 'Overview': '/overview', 'Study planner': '/study-planner', 'Syllabus': '/syllabus', 'Backlog': '/backlog', 'Done Tasks': '/done-tasks', 'Practice & tests': '/practice-tests', 'Analytics': '/analytics', 'Revision planner': '/revision-planner' }
-const pageFromPath = (path: string): Page => (Object.entries(pagePaths).find(([, route]) => route === path.replace(/\\/+$/, '') || (path === '/' && route === '/overview'))?.[0] as Page | undefined) ?? 'Overview'
+const pageFromPath = (path: string): Page => (Object.entries(pagePaths).find(([, route]) => route === (path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path) || (path === '/' && route === '/overview'))?.[0] as Page | undefined) ?? 'Overview'
 const nav: { label: Page; icon: typeof LayoutDashboard; group: string }[] = [
   { label: 'Overview', icon: LayoutDashboard, group: 'WORKSPACE' },
   { label: 'Study planner', icon: CalendarDays, group: 'WORKSPACE' },
