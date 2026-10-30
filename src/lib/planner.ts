@@ -106,3 +106,22 @@ export function getChapterPerformance(subjects: Subject[], logs: import('../type
     return { subject: subject.name, chapter: chapter.name, topicCount: topics.length, lecturesDone, dppDone, modulesDone, revisionDone, attempted, correct, mistakes, accuracy, practiceSets: matching.length, priority: attempted === 0 ? 'No data' : accuracy < 60 ? 'High' : accuracy < 80 ? 'Medium' : 'On track' }
   }))
 }
+
+
+export type RevisionQueueItem = { subjectId: string; subject: string; chapterId: string; chapter: string; topicId: string; topic: string; dueDate: string; revisionCount: number; lastRevisedAt?: string; status: 'Overdue' | 'Due today' | 'Upcoming' }
+export function getRevisionQueue(subjects: Subject[], today = dateKey(new Date())): RevisionQueueItem[] {
+  return subjects.flatMap(subject => (subject.chapters ?? []).flatMap(chapter => chapter.topics.flatMap(topic => {
+    if (topic.lectureStatus !== 'Completed' || !topic.nextRevisionDate) return []
+    const dueDate = topic.nextRevisionDate
+    const status = dueDate < today ? 'Overdue' as const : dueDate === today ? 'Due today' as const : 'Upcoming' as const
+    return [{ subjectId: subject.id, subject: subject.name, chapterId: chapter.id, chapter: chapter.name, topicId: topic.id, topic: topic.name, dueDate, revisionCount: topic.revisionCount ?? 0, lastRevisedAt: topic.lastRevisedAt, status }]
+  }))).sort((a, b) => a.dueDate.localeCompare(b.dueDate) || a.subject.localeCompare(b.subject) || a.topic.localeCompare(b.topic))
+}
+export function getNextRevisionDate(revisionCount: number, fromDate: string): string {
+  const intervals = [1, 3, 7, 14, 30]
+  const days = intervals[Math.min(Math.max(0, revisionCount), intervals.length - 1)]
+  const [year, month, day] = fromDate.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  date.setDate(date.getDate() + days)
+  return dateKey(date)
+}
