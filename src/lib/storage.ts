@@ -1,6 +1,6 @@
 import type { Workspace, Subject, Chapter, Topic, PracticeRecord } from '../types'
 const KEY = 'prep360-workspace-v1'
-export const emptyWorkspace: Workspace = { exam: '', targetDate: '', tasks: [], subjects: [], practiceLogs: [] }
+export const emptyWorkspace: Workspace = { exam: '', targetDate: '', tasks: [], subjects: [], practiceLogs: [], profileConfigured: false }
 const validStatus = (value: unknown): Topic['lectureStatus'] => value === 'Completed' || value === 'In progress' ? value : 'Not started'
 function normalizeTopic(value: unknown, index: number): Topic {
   const item = (value && typeof value === 'object' ? value : {}) as Partial<Topic>
