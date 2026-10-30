@@ -41,7 +41,7 @@ export default function App() {
   const [targetDate, setTargetDate] = useState(workspace.targetDate)
   const [subjectName, setSubjectName] = useState('')
   const [lectureTotal, setLectureTotal] = useState('')
-  const [averageLectureMinutes, setAverageLectureMinutes] = useState('75')
+  const [averageLectureMinutes] = useState('75')
   const [dailyStudyHours, setDailyStudyHours] = useState('3')
   const [weeklyStudyDays, setWeeklyStudyDays] = useState('6')
   const [scheduleNotice, setScheduleNotice] = useState('')
