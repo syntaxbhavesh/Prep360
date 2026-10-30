@@ -76,3 +76,10 @@ export function generateStudySchedule(tasks: StudyTask[], hoursPerDay: number, s
 }
 
 export function getOverdueTasks(tasks: StudyTask[], today = dateKey(new Date())) { return tasks.filter(task => !task.done && task.date < today) }
+export function getPracticeTotals(logs: import('../types').PracticeRecord[]) {
+  const totalQuestions = logs.reduce((sum, log) => sum + log.totalQuestions, 0)
+  const attempted = logs.reduce((sum, log) => sum + log.attempted, 0)
+  const correct = logs.reduce((sum, log) => sum + log.correct, 0)
+  const mistakes = logs.reduce((sum, log) => sum + log.mistakes, 0)
+  return { totalQuestions, attempted, correct, mistakes, accuracy: attempted > 0 ? Math.round(correct / attempted * 100) : 0, completion: totalQuestions > 0 ? Math.min(100, Math.round(attempted / totalQuestions * 100)) : 0 }
+}
