@@ -83,3 +83,26 @@ export function getPracticeTotals(logs: import('../types').PracticeRecord[]) {
   const mistakes = logs.reduce((sum, log) => sum + log.mistakes, 0)
   return { totalQuestions, attempted, correct, mistakes, accuracy: attempted > 0 ? Math.round(correct / attempted * 100) : 0, completion: totalQuestions > 0 ? Math.min(100, Math.round(attempted / totalQuestions * 100)) : 0 }
 }
+
+export type ChapterPerformance = {
+  subject: string; chapter: string; topicCount: number; lecturesDone: number;
+  dppDone: number; modulesDone: number; revisionDone: number;
+  attempted: number; correct: number; mistakes: number; accuracy: number;
+  practiceSets: number; priority: 'High' | 'Medium' | 'On track' | 'No data'
+}
+export function getChapterPerformance(subjects: Subject[], logs: import('../types').PracticeRecord[]): ChapterPerformance[] {
+  const normalize = (value: string) => value.trim().toLocaleLowerCase()
+  return subjects.flatMap(subject => (subject.chapters ?? []).map(chapter => {
+    const topics = chapter.topics ?? []
+    const matching = logs.filter(log => normalize(log.subject) === normalize(subject.name) && normalize(log.chapter) === normalize(chapter.name))
+    const attempted = matching.reduce((sum, log) => sum + log.attempted, 0)
+    const correct = matching.reduce((sum, log) => sum + log.correct, 0)
+    const mistakes = matching.reduce((sum, log) => sum + log.mistakes, 0)
+    const accuracy = attempted ? Math.round(correct / attempted * 100) : 0
+    const lecturesDone = topics.filter(topic => topic.lectureStatus === 'Completed').length
+    const dppDone = topics.filter(topic => topic.dppStatus === 'Completed').length
+    const modulesDone = topics.filter(topic => topic.moduleStatus === 'Completed').length
+    const revisionDone = topics.filter(topic => topic.revisionStatus === 'Completed').length
+    return { subject: subject.name, chapter: chapter.name, topicCount: topics.length, lecturesDone, dppDone, modulesDone, revisionDone, attempted, correct, mistakes, accuracy, practiceSets: matching.length, priority: attempted === 0 ? 'No data' : accuracy < 60 ? 'High' : accuracy < 80 ? 'Medium' : 'On track' }
+  }))
+}
