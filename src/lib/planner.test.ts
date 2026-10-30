@@ -38,12 +38,12 @@ describe('Prep360 planning utilities', () => {
       { id: 'two', title: 'Two', subject: 'Maths', kind: 'Practice', minutes: 60, date: '2026-10-21', done: false },
       { id: 'three', title: 'Three', subject: 'Chemistry', kind: 'Revision', minutes: 60, date: '2026-10-21', done: false },
     ]
-    const result = generateStudySchedule(source, 2.5, 5, new Date(2026, 9, 30))
+    const result = generateStudySchedule(source, 2, 5, new Date(2026, 9, 30))
     expect(result.scheduledCount).toBe(3)
     expect(result.overloadedCount).toBe(0)
     expect(result.tasks[0].date).toBe('2026-10-20')
     expect(result.tasks[1].date).toBe('2026-10-30')
-    expect(result.tasks[2].date).toBe('2026-10-30')
+    expect(result.tasks[2].date).toBe('2026-11-02')
     expect(result.tasks[3].date).toBe('2026-11-02')
   })
   it('flags tasks that exceed daily capacity and leaves tasks unscheduled when capacity is zero', () => {
